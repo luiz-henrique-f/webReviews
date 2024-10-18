@@ -4,24 +4,40 @@ import { DollarSign } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
 import { Bar, CartesianGrid, XAxis, BarChart } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+
+interface MonthlyData {
+    qtd: string;
+    nome_mes: string;
+}
+
+type MonthlyDataArray = MonthlyData[];
+
+const fetchPosts = async (): Promise<MonthlyDataArray> => {
+    const res = await fetch('http://localhost:3333/reviewsMonth?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
+    if (!res.ok) {
+        throw new Error('Falha ao buscar os dados');
+    }
+    return res.json();
+};
 
 export function ChartOverview() {
-    const chartData = [
-        { month: "January", desktop: 186, mobile: 80 },
-        { month: "February", desktop: 305, mobile: 200 },
-        { month: "March", desktop: 237, mobile: 120 },
-        { month: "April", desktop: 73, mobile: 190 },
-        { month: "May", desktop: 209, mobile: 130 },
-        { month: "June", desktop: 214, mobile: 140 },
-    ]
+
+    const { data: monthlyDataArray } = useQuery({
+        queryKey: ['reviewsMonth'],
+        queryFn: fetchPosts,
+    }
+    )
+
+    const chartData = monthlyDataArray
 
     const chartConfig = {
-        desktop: {
-            label: "Desktop",
+        qtd: {
+            label: "Total",
             color: "#2563eb",
         },
-        mobile: {
-            label: "Mobile",
+        nome_mes: {
+            label: "Month",
             color: "#60a5fa",
         },
     } satisfies ChartConfig
@@ -42,15 +58,15 @@ export function ChartOverview() {
                     <BarChart data={chartData}>
                         <CartesianGrid vertical={false} />
                         <XAxis
-                            dataKey="month"
+                            dataKey="nome_mes"
                             tickLine={false}
                             tickMargin={10}
                             axisLine={false}
                             tickFormatter={(value) => value.slice(0, 3)}
                         />
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-                        <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+                        <Bar dataKey="qtd" fill="var(--color-qtd)" radius={4} />
+                        {/* <Bar dataKey="nome_mes" fill="var(--color-nome_mes)" radius={4} /> */}
                     </BarChart>
                 </ChartContainer>
             </CardContent>

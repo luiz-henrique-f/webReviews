@@ -1,9 +1,108 @@
+"use client"
+
 import { ChartOverview } from "@/components/chart";
 import { Reviews } from "@/components/reviews";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
 import { BadgeDollarSign, DollarSign, Percent, Users } from "lucide-react";
 
+interface TotalReviews {
+  qtd: string;
+}
+
+interface ReviewsData {
+  totalReviews: TotalReviews;
+}
+
+interface TotalReviews30Days {
+  qtd: string;
+}
+
+interface ReviewsData30Days {
+  totalReviews: TotalReviews30Days;
+}
+
+interface TotalReviewsToday {
+  qtd: string;
+}
+
+interface ReviewsDataToday {
+  totalReviews: TotalReviewsToday;
+}
+
+interface TotalReviewsAvg {
+  qtd: string;
+}
+
+interface ReviewsDataAvg {
+  totalReviews: TotalReviewsAvg;
+}
+
+const fetchPosts = async (): Promise<ReviewsData> => {
+  const res = await fetch('http://localhost:3333/totalReviewsClient?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
+  if (!res.ok) {
+    throw new Error('Falha ao buscar os dados');
+  }
+  return res.json();
+};
+
+const fetchPosts30Days = async (): Promise<ReviewsData30Days> => {
+  const res = await fetch('http://localhost:3333/totalReviews30Days?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
+  if (!res.ok) {
+    throw new Error('Falha ao buscar os dados');
+  }
+  return res.json();
+};
+
+const fetchPostsToday = async (): Promise<ReviewsDataToday> => {
+  const res = await fetch('http://localhost:3333/reviewsToday?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
+  if (!res.ok) {
+    throw new Error('Falha ao buscar os dados');
+  }
+  return res.json();
+};
+
+const fetchPostsAvg = async (): Promise<ReviewsDataAvg> => {
+  const res = await fetch('http://localhost:3333/totalReviewsAvg?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
+  if (!res.ok) {
+    throw new Error('Falha ao buscar os dados');
+  }
+  return res.json();
+};
+
 export default function Home() {
+
+  const { data: reviewsData } = useQuery({
+    queryKey: ['totalReviews'],
+    queryFn: fetchPosts,
+  }
+  )
+
+  const { data: reviewsData30Days } = useQuery({
+    queryKey: ['totalReviews30Days'],
+    queryFn: fetchPosts30Days,
+  }
+  )
+
+  const { data: reviewsDataToday } = useQuery({
+    queryKey: ['totalReviewsToday'],
+    queryFn: fetchPostsToday,
+  }
+  )
+
+  const { data: reviewsDataAvg } = useQuery({
+    queryKey: ['totalReviewsAvg'],
+    queryFn: fetchPostsAvg,
+  }
+  )
+
+  console.log(reviewsDataAvg)
+
+  const totalReviews = reviewsData?.totalReviews;
+  const totalReviews30Days = reviewsData30Days?.totalReviews;
+  const totalReviewsToday = reviewsDataToday?.totalReviews;
+  const totalReviewsAvg = reviewsDataAvg?.totalReviews;
+
   return (
     <main className="sm:ml-14 p-4">
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -11,7 +110,7 @@ export default function Home() {
           <CardHeader>
             <div className="flex items-center justify-center">
               <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
-                Total de Comentários
+                Total de comentários
               </CardTitle>
               <DollarSign className="ml-auto w-4 h-4" />
             </div>
@@ -22,7 +121,7 @@ export default function Home() {
           </CardHeader>
 
           <CardContent>
-            <p className="text-base sm:text-lg font-bold">R$ 40.000</p>
+            <p className="text-base sm:text-lg font-bold">{totalReviews?.qtd ?? '0'}</p>
           </CardContent>
         </Card>
 
@@ -41,7 +140,7 @@ export default function Home() {
           </CardHeader>
 
           <CardContent>
-            <p className="text-base sm:text-lg font-bold">234</p>
+            <p className="text-base sm:text-lg font-bold">{totalReviews30Days?.qtd ?? '0'}</p>
           </CardContent>
         </Card>
 
@@ -60,7 +159,7 @@ export default function Home() {
           </CardHeader>
 
           <CardContent>
-            <p className="text-base sm:text-lg font-bold">65</p>
+            <p className="text-base sm:text-lg font-bold">{totalReviewsToday?.qtd ?? '0'}</p>
           </CardContent>
         </Card>
 
@@ -68,18 +167,18 @@ export default function Home() {
           <CardHeader>
             <div className="flex items-center justify-center">
               <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
-                Novos Comentários
+                Média de notas
               </CardTitle>
               <BadgeDollarSign className="ml-auto w-4 h-4" />
             </div>
 
             <CardDescription>
-              Novos comentários em 30 dias
+              Média de notas dos comentários em 30 dias
             </CardDescription>
           </CardHeader>
 
           <CardContent>
-            <p className="text-base sm:text-lg font-bold">2.300</p>
+            <p className="text-base sm:text-lg font-bold">{totalReviewsAvg?.qtd ?? '0'}</p>
           </CardContent>
         </Card>
       </section>

@@ -4,6 +4,7 @@ import "./globals.css";
 // import { cn } from "../lib/utils"
 import { Inter } from "next/font/google"
 import { Sidebar } from "@/components/sidebar";
+import { QueryProvider } from "@/components/react-query";
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -32,8 +33,10 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={inter.className}>
-        <Sidebar/>
-        {children}
+        <QueryProvider>
+          <Sidebar />
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );

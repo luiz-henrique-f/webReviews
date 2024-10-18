@@ -1,8 +1,34 @@
 import { CircleDollarSign } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useQuery } from "@tanstack/react-query";
+import { Rating } from 'react-simple-star-rating'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+
+interface UserData {
+    id: string;
+    name: string;
+    review_note: number;
+    message: string
+}
+
+type UserDataArray = UserData[];
+
+const fetchPosts = async (): Promise<UserDataArray> => {
+    const res = await fetch('http://localhost:3333/Clients?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
+    if (!res.ok) {
+        throw new Error('Falha ao buscar os dados');
+    }
+    return res.json();
+};
 
 export function Reviews() {
+
+    const { data: clients } = useQuery({
+        queryKey: ['clients'],
+        queryFn: fetchPosts,
+    }
+    )
     return (
         <Card className="flex-1">
             <CardHeader>
@@ -17,17 +43,34 @@ export function Reviews() {
                 </CardDescription>
             </CardHeader>
 
-            <CardContent>
-                <article className="flex items-center gap-2 border-b py-2">
-                    <Avatar className="w-8 h-8">
-                        <AvatarImage src="https://w7.pngwing.com/pngs/364/361/png-transparent-account-avatar-profile-user-avatars-icon-thumbnail.png" />
-                        <AvatarFallback>LH</AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <p className="text-sm sm:text-base font-semibold">Nome</p>
+            {clients && clients.map((client) => {
+                return (
+                    <div key={client.id}>
+                        <CardContent className="cursor-pointer">
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <article className="flex items-center gap-2 border-b py-2">
+                                            <Avatar className="w-8 h-8">
+                                                <AvatarImage src="https://w7.pngwing.com/pngs/364/361/png-transparent-account-avatar-profile-user-avatars-icon-thumbnail.png" />
+                                                <AvatarFallback>LH</AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                                <p className="text-sm sm:text-base font-semibold">{client.name}</p>
+                                                <Rating SVGstyle={{ display: "inline" }} size={20} initialValue={client.review_note} readonly={true} />
+                                            </div>
+                                        </article>
+                                    </TooltipTrigger>
+                                    <TooltipContent side='right'>
+                                        {client.message}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </CardContent>
                     </div>
-                </article>
-            </CardContent>
+                )
+            })}
+
         </Card>
     )
 }
