@@ -6,64 +6,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useQuery } from "@tanstack/react-query";
 import { BadgeDollarSign, DollarSign, Percent, Users } from "lucide-react";
 
-interface TotalReviews {
-  qtd: string;
+
+interface ReviewData {
+  totalReviews: {
+    qtd: string | number;
+  };
 }
 
-interface ReviewsData {
-  totalReviews: TotalReviews;
+interface DashboardData {
+  reviewsToday: ReviewData;
+  totalReviews: ReviewData;
+  reviewsLast30Days: ReviewData;
+  reviewsAvg: ReviewData;
 }
 
-interface TotalReviews30Days {
-  qtd: string;
-}
-
-interface ReviewsData30Days {
-  totalReviews: TotalReviews30Days;
-}
-
-interface TotalReviewsToday {
-  qtd: string;
-}
-
-interface ReviewsDataToday {
-  totalReviews: TotalReviewsToday;
-}
-
-interface TotalReviewsAvg {
-  qtd: string;
-}
-
-interface ReviewsDataAvg {
-  totalReviews: TotalReviewsAvg;
-}
-
-const fetchPosts = async (): Promise<ReviewsData> => {
-  const res = await fetch('http://localhost:3333/totalReviewsClient?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
-  if (!res.ok) {
-    throw new Error('Falha ao buscar os dados');
-  }
-  return res.json();
-};
-
-const fetchPosts30Days = async (): Promise<ReviewsData30Days> => {
-  const res = await fetch('http://localhost:3333/totalReviews30Days?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
-  if (!res.ok) {
-    throw new Error('Falha ao buscar os dados');
-  }
-  return res.json();
-};
-
-const fetchPostsToday = async (): Promise<ReviewsDataToday> => {
-  const res = await fetch('http://localhost:3333/reviewsToday?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
-  if (!res.ok) {
-    throw new Error('Falha ao buscar os dados');
-  }
-  return res.json();
-};
-
-const fetchPostsAvg = async (): Promise<ReviewsDataAvg> => {
-  const res = await fetch('http://localhost:3333/totalReviewsAvg?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
+const fetchPostsDashboard = async (): Promise<DashboardData> => {
+  const res = await fetch('http://localhost:3333/dataDashboard?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
   if (!res.ok) {
     throw new Error('Falha ao buscar os dados');
   }
@@ -72,36 +30,16 @@ const fetchPostsAvg = async (): Promise<ReviewsDataAvg> => {
 
 export default function Home() {
 
-  const { data: reviewsData } = useQuery({
-    queryKey: ['totalReviews'],
-    queryFn: fetchPosts,
+  const { data: dashboardData } = useQuery({
+    queryKey: ['dashboardData'],
+    queryFn: fetchPostsDashboard,
   }
   )
 
-  const { data: reviewsData30Days } = useQuery({
-    queryKey: ['totalReviews30Days'],
-    queryFn: fetchPosts30Days,
-  }
-  )
-
-  const { data: reviewsDataToday } = useQuery({
-    queryKey: ['totalReviewsToday'],
-    queryFn: fetchPostsToday,
-  }
-  )
-
-  const { data: reviewsDataAvg } = useQuery({
-    queryKey: ['totalReviewsAvg'],
-    queryFn: fetchPostsAvg,
-  }
-  )
-
-  console.log(reviewsDataAvg)
-
-  const totalReviews = reviewsData?.totalReviews;
-  const totalReviews30Days = reviewsData30Days?.totalReviews;
-  const totalReviewsToday = reviewsDataToday?.totalReviews;
-  const totalReviewsAvg = reviewsDataAvg?.totalReviews;
+  const totalReviews = dashboardData?.totalReviews?.totalReviews;
+  const totalReviews30Days = dashboardData?.reviewsLast30Days?.totalReviews;
+  const totalReviewsToday = dashboardData?.reviewsToday?.totalReviews;
+  const totalReviewsAvg = dashboardData?.reviewsAvg?.totalReviews;
 
   return (
     <main className="sm:ml-14 p-4">

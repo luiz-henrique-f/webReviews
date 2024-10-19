@@ -1,4 +1,4 @@
-import { CircleDollarSign } from "lucide-react";
+import { CircleDollarSign, Search } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useQuery } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ interface UserData {
 type UserDataArray = UserData[];
 
 const fetchPosts = async (): Promise<UserDataArray> => {
-    const res = await fetch('http://localhost:3333/Clients?idClient=d07ca3c3-ff77-4e9d-9e80-55185b36acee');
+    const res = await fetch('http://localhost:3333/Clients?idClient=c1654d0f-ea9b-4467-93a3-2a706807450a');
     if (!res.ok) {
         throw new Error('Falha ao buscar os dados');
     }
@@ -43,7 +43,7 @@ export function Reviews() {
                 </CardDescription>
             </CardHeader>
 
-            {clients && clients.map((client) => {
+            {clients ? clients.map((client) => {
                 return (
                     <div key={client.id}>
                         <CardContent className="cursor-pointer">
@@ -69,7 +69,10 @@ export function Reviews() {
                         </CardContent>
                     </div>
                 )
-            })}
+            }) : <div className="flex justify-center">
+                <Search />
+                <span>Nenhum cliente comentou nas últimas 24 horas</span>
+            </div>}
 
         </Card>
     )
